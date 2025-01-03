@@ -63,10 +63,10 @@ class ImageGridApp:
                 draw = ImageDraw.Draw(img)
                 text_position = (img.width - 10, img.height - 10)  # Bottom-right corner
                 text_position = (text_position[0] - len(text) * 6, text_position[1] - 15)  # Adjust for text width
-                draw.text(text_position, text, fill="white")
+                draw.text(text_position, text, fill="green")
 
                 # Display the image in the appropriate label
-                photo = ImageTk.PhotoImage(draw)
+                photo = ImageTk.PhotoImage(img)
                 self.labels[row][col].configure(image=photo)
                 self.labels[row][col].image = photo
 
