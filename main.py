@@ -6,6 +6,8 @@ from os import mkdir
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 import tkinter as tk
 from tkinter import ttk
+import numpy as np
+import cv2
 
 
 
@@ -83,6 +85,11 @@ class ImageGridApp:
         self.root.after(100, self.update_images)
 
 
+# Add text to ndarray image
+def add_text_to_ndarray(image, text):
+    cv2.putText(image, text, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (144, 144, 144), 2, cv2.LINE_AA)
+    return image
+
 def emulate(name, url, q: Queue, use=False):
     try:
         mkdir(f"./images/{name}/")
@@ -100,22 +107,41 @@ def emulate(name, url, q: Queue, use=False):
 
 
 def render(q: Queue):
+    # Grid settings
+    grid_size = (2, 3)  # 1x3 grid
+    cell_size = (480, 480)  # Size of each grid cell
+    canvas_size = (grid_size[0] * cell_size[0], grid_size[1] * cell_size[1])
+    # Create a blank canvas
+    canvas = np.zeros((canvas_size[0], canvas_size[1], 3), dtype=np.uint8)
+    x = 0
     while True:
+        x += 1
         a = q.get()
-        img = Image.fromarray(a[1][1])
+        #img = Image.fromarray(a[1][1])
+        #(width, height) = (round(img.width * 3), round(img.height * 2.5))
+        #im_resized = img.resize((width, height))
         # img.save(PATH_FORMAT_STRING.format(name=a[0],frame=a[1][0]))
-        image_queue.put((INDEX_MAPPING[a[0]][0], INDEX_MAPPING[a[0]][1], img, f"{a[0]}: {a[1][2]}"))
+        #image_queue.put((INDEX_MAPPING[a[0]][0], INDEX_MAPPING[a[0]][1], im_resized, f"{a[0]}: {a[1][2]}"))
+        i, j = INDEX_MAPPING[a[0]]
+        cv_image = cv2.cvtColor(a[1][1], cv2.COLOR_RGBA2BGR)
+        cv_image = cv2.resize(cv_image, cell_size)  # Resize to fit the cell
+        cv_image = add_text_to_ndarray(cv_image, f"{a[0]}: {a[1][2]}")
+        x, y = i * cell_size[0], j * cell_size[1]
+        canvas[x:x + cell_size[0], y:y + cell_size[1]] = cv_image
+        cv2.imshow("Dynamic Grid", canvas)
+        cv2.waitKey(1)
+
 
 
 def main():
     root = tk.Tk()
-    app = ImageGridApp(root)
+    #app = ImageGridApp(root)
 
     with ThreadPoolExecutor(16) as pool:
         q = Queue()
         futures = [pool.submit(emulate, src, URL[src], q, True) for src in URL]
         rend_future = pool.submit(render, q)
-        root.mainloop()
+        #root.mainloop()
 
     return 0
 
