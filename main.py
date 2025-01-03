@@ -109,13 +109,12 @@ def emulate(name, url, q: Queue, use=False):
 def render(q: Queue):
     # Grid settings
     grid_size = (2, 3)  # 1x3 grid
-    cell_size = (480, 480)  # Size of each grid cell
+    cell_size = (300, 300)  # Size of each grid cell
     canvas_size = (grid_size[0] * cell_size[0], grid_size[1] * cell_size[1])
     # Create a blank canvas
     canvas = np.zeros((canvas_size[0], canvas_size[1], 3), dtype=np.uint8)
-    x = 0
+    last_time = time()
     while True:
-        x += 1
         a = q.get()
         #img = Image.fromarray(a[1][1])
         #(width, height) = (round(img.width * 3), round(img.height * 2.5))
@@ -130,6 +129,11 @@ def render(q: Queue):
         canvas[x:x + cell_size[0], y:y + cell_size[1]] = cv_image
         cv2.imshow("Dynamic Grid", canvas)
         cv2.waitKey(1)
+        new_time = time()
+        if new_time - last_time > 60:
+            with q.mutex:
+                q.queue.clear()
+            last_time = new_time
 
 
 

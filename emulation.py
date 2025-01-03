@@ -42,18 +42,15 @@ class GameState:
 class Connection:
     def __init__(self, url):
         self.session = requests.Session()
-
-        retries = requests.adapters.Retry(total=5, backoff_factor=0.1, status_forcelist=[ 500, 502, 503, 504 ])
-
-        self.session.mount('http://', requests.adapters.HTTPAdapter(max_retries=retries))
         self.url = url
 
     def get_data(self):
-        try:
-            data = int(self.session.get(self.url).content)
-            return data
-        except Exception as e:
-            print(e)
+        while True:
+            try:
+                data = int(self.session.get(self.url, timeout=5).content)
+                return data
+            except Exception as e:
+                print(e)
 
 
 class GameEmulation:
@@ -69,15 +66,17 @@ class GameEmulation:
         state = GameState()
         i = 0
         while True:
-            i += 1
+            i += 10
+            for x in range(9):
+                button = BUTTONS[self.connection.get_data()]
+                self.emulation.button(button)
+                self.emulation.tick(1, render=False)
 
             button = BUTTONS[self.connection.get_data()]
             self.emulation.button(button)
-            self.emulation.tick(1, render=i % 5 == 0)
-
-            if i % 5 == 0:
-                state.update(self.read_m)
-                yield i, self.emulation.screen.ndarray.copy(), state.get_score()
+            self.emulation.tick(1, render=True)
+            state.update(self.read_m)
+            yield i, self.emulation.screen.ndarray.copy(), state.get_score()
 
     def read_hp(self, start):
         return 256 * self.read_m(start) + self.read_m(start + 1)
