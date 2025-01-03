@@ -69,7 +69,7 @@ class ImageGridApp:
             row, col, img, text = image_queue.get()
             if 0 <= row < GRID_ROWS and 0 <= col < GRID_COLUMNS:
                 draw = ImageDraw.Draw(img)
-                font = ImageFont.truetype("arial.ttf", 15)
+                font = ImageFont.truetype("arial.ttf", 50)
                 text_position = (img.width - 10, img.height - 10)  # Bottom-right corner
                 text_position = (text_position[0] - len(text) * 6, text_position[1] - 15)  # Adjust for text width
                 draw.text(text_position, text, fill="green", font=font)
