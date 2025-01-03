@@ -3,7 +3,7 @@ from queue import Queue
 from time import time
 from os import mkdir
 
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
 import tkinter as tk
 from tkinter import ttk
 
@@ -58,8 +58,13 @@ class ImageGridApp:
     def update_images(self):
         while not image_queue.empty():
             # Get image and position from the queue
-            row, col, img = image_queue.get()
+            row, col, img, text = image_queue.get()
             if 0 <= row < GRID_ROWS and 0 <= col < GRID_COLUMNS:
+                draw = ImageDraw.Draw(img)
+                text_position = (img.width - 10, img.height - 10)  # Bottom-right corner
+                text_position = (text_position[0] - len(text) * 6, text_position[1] - 15)  # Adjust for text width
+                draw.text(text_position, text, fill="white")
+
                 # Display the image in the appropriate label
                 photo = ImageTk.PhotoImage(img)
                 self.labels[row][col].configure(image=photo)
@@ -90,7 +95,7 @@ def render(q: Queue):
         a = q.get()
         img = Image.fromarray(a[1][1])
         # img.save(PATH_FORMAT_STRING.format(name=a[0],frame=a[1][0]))
-        image_queue.put((INDEX_MAPPING[a[0]][0], INDEX_MAPPING[a[0]][1], img))
+        image_queue.put((INDEX_MAPPING[a[0]][0], INDEX_MAPPING[a[0]][1], img, f"{a[0][0]}: {a[1][2]}"))
 
 
 def main():
