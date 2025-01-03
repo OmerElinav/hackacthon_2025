@@ -17,7 +17,7 @@ HP_ADDR = [
     (0xD248, 0xD269),
 ]
 BADGES_ADDR = 0xD356
-BUTTONS = ["a", "b", "start", "select", "left", "right", "up", "down"]
+BUTTONS = ["a", "b", "left", "right", "up", "down", "start", "select",]
 
 
 @dataclass
@@ -70,15 +70,14 @@ class GameEmulation:
         i = 0
         while True:
             i += 1
-            # print(i)
 
             button = BUTTONS[self.connection.get_data()]
             self.emulation.button(button)
-            self.emulation.tick(1, render=i % 1500 == 0)
+            self.emulation.tick(1, render=i % 5 == 0)
 
-            if i % 1500 == 0:
+            if i % 5 == 0:
                 state.update(self.read_m)
-                yield i, self.emulation.screen.ndarray.copy(), state.__repr__()
+                yield i, self.emulation.screen.ndarray.copy(), state.get_score()
 
     def read_hp(self, start):
         return 256 * self.read_m(start) + self.read_m(start + 1)

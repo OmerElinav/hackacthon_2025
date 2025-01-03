@@ -80,9 +80,9 @@ def emulate(name, url, q: Queue, use=False):
     for i in game.run():
         frames += i[0]
         if use:
-            print(f"game {name}, {i[2]}")
+            #print(f"game {name}, {i[2]}")
             q.put_nowait((name, i))
-        print(f"fps={frames / (time()-start)}")
+        #print(f"fps={frames / (time()-start)}")
 
 
 def render(q: Queue):
