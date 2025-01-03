@@ -3,7 +3,7 @@ from queue import Queue
 from time import time
 from os import mkdir
 
-from PIL import Image, ImageTk, ImageDraw
+from PIL import Image, ImageTk, ImageDraw, ImageFont
 import tkinter as tk
 from tkinter import ttk
 
@@ -32,6 +32,14 @@ INDEX_MAPPING = {
     "sqrt_2": (1, 1),
     "genome": (1, 2)
 }
+REVERSE_INDEX = {
+    (0, 0): "episode",
+    (0, 1): "natbag" ,
+    (0, 2): "mars",
+    (1, 0): "e",
+    (1, 1): "sqrt_2",
+    (1, 2): "genome"
+}
 
 # Thread-safe queue for images
 image_queue = Queue()
@@ -47,7 +55,7 @@ class ImageGridApp:
         for row in range(GRID_ROWS):
             row_labels = []
             for col in range(GRID_COLUMNS):
-                label = ttk.Label(self.root, text="", borderwidth=2, relief="solid")
+                label = ttk.Label(self.root, text=REVERSE_INDEX[(row, col)], borderwidth=2, relief="solid")
                 label.grid(row=row, column=col, padx=5, pady=5)
                 row_labels.append(label)
             self.labels.append(row_labels)
@@ -61,9 +69,10 @@ class ImageGridApp:
             row, col, img, text = image_queue.get()
             if 0 <= row < GRID_ROWS and 0 <= col < GRID_COLUMNS:
                 draw = ImageDraw.Draw(img)
+                font = ImageFont.truetype("arial.ttf", 15)
                 text_position = (img.width - 10, img.height - 10)  # Bottom-right corner
                 text_position = (text_position[0] - len(text) * 6, text_position[1] - 15)  # Adjust for text width
-                draw.text(text_position, text, fill="green")
+                draw.text(text_position, text, fill="green", font=font)
 
                 # Display the image in the appropriate label
                 photo = ImageTk.PhotoImage(img)
