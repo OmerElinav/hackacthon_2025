@@ -71,7 +71,7 @@ class ImageGridApp:
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype("arial.ttf", 50)
                 text_position = (img.width - 50, img.height - 50)  # Bottom-right corner
-                text_position = (text_position[0] - len(text) * 6, text_position[1] - 50)  # Adjust for text width
+                text_position = (text_position[0] - len(text) * 20, text_position[1] - 50)  # Adjust for text width
                 draw.text(text_position, text, fill="green", font=font)
 
                 # Display the image in the appropriate label
