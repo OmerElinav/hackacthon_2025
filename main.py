@@ -95,7 +95,7 @@ def render(q: Queue):
         a = q.get()
         img = Image.fromarray(a[1][1])
         # img.save(PATH_FORMAT_STRING.format(name=a[0],frame=a[1][0]))
-        image_queue.put((INDEX_MAPPING[a[0]][0], INDEX_MAPPING[a[0]][1], img, f"{a[0][0]}: {a[1][2]}"))
+        image_queue.put((INDEX_MAPPING[a[0]][0], INDEX_MAPPING[a[0]][1], img, f"{a[0]}: {a[1][2]}"))
 
 
 def main():
