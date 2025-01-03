@@ -66,7 +66,7 @@ class ImageGridApp:
                 draw.text(text_position, text, fill="white")
 
                 # Display the image in the appropriate label
-                photo = ImageTk.PhotoImage(img)
+                photo = ImageTk.PhotoImage(draw)
                 self.labels[row][col].configure(image=photo)
                 self.labels[row][col].image = photo
 
